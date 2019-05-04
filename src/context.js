@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import axios from "axios";
 const Context = React.createContext();
 
 const reducer = (state, action) => {
@@ -11,6 +11,11 @@ const reducer = (state, action) => {
           contact => contact.id !== action.payload
         )
       };
+    case "ADD_CONTACT":
+      return {
+        ...state,
+        contacts: [action.payload, ...state.contacts]
+      };
     default:
       return state;
   }
@@ -18,30 +23,16 @@ const reducer = (state, action) => {
 
 export class Provider extends Component {
   state = {
-    contacts: [
-      {
-        id: 1,
-        name: "Marc Gagne",
-        email: "macrGagne@gagrne.fr",
-        phone: "111-222-3333"
-      },
-      {
-        id: 2,
-        name: "Jean drapo",
-        email: "olympe@mtl.mtl",
-        phone: "888-888-8989"
-      },
-      {
-        id: 3,
-        name: "Lia ail",
-        email: "daw2112@dw.fr",
-        phone: "987-456-1233"
-      }
-    ],
+    contacts: [],
     dispatch: action => {
       this.setState(state => reducer(state, action));
     }
   };
+
+  async componentDidMount() {
+    const res = await axios.get("https://jsonplaceholder.typicode.com/users");
+    this.setState({ contacts: res.data });
+  }
 
   render() {
     return (
